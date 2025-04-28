@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Internato FG</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet">
@@ -15,10 +15,19 @@
             font-weight: bold;
         }
         p {
-            margin-bottom: 1em;
+            margin-bottom: 0.5em;
         }
         .quebra-linha {
             white-space: pre-wrap;
+        }
+        #texto-saida:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        #texto-saida p {
+           line-height: 1.3;
+           margin-bottom: 0.5em;
         }
     </style>
 </head>
@@ -60,8 +69,11 @@
             </section>
             <section>
                 <label for="texto-saida" class="block text-gray-700 text-sm font-bold mb-2">Texto convertido:</label>
-                <div id="texto-saida" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto quebra-linha rounded-md"></div>
-                <button id="copiar-texto" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Copiar Texto</button>
+                <div id="texto-saida" contenteditable="true" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto quebra-linha rounded-md"></div>
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button id="copiar-texto" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Copiar Texto</button>
+                    <button id="resetar-texto" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Resetar Texto</button>
+                </div>
             </section>
         </main>
     </div>
@@ -75,6 +87,7 @@
         const textoSaida = document.getElementById('texto-saida');
         const converterTexto = document.getElementById('converter-texto');
         const copiarTextoBtn = document.getElementById('copiar-texto');
+        const resetarTextoBtn = document.getElementById('resetar-texto');
 
         // Função para capitalizar o texto, preservando a formatação original
         function capitalizarTexto(texto) {
@@ -85,15 +98,26 @@
 
             linhas.forEach((linha, linhaIndex) => {
                 linha = linha.trim();
-                if (linha.startsWith('#')) {
-                    resultado += `<p class="negrito">${linha.toUpperCase()}</p>`;
-                } else {
-                    const palavras = linha.split(' ');
-                    let linhaFormatada = palavras.map(palavra => {
-                        return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase();
-                    }).join(' ');
-                    resultado +=  `<p style="margin-bottom: 1em;">${linhaFormatada}</p>`;
+                let titulo = '';
+                let textoParaConverter = linha;
+
+                if (linha.startsWith('#') && linha.includes(':')) {
+                    const partes = linha.split(':');
+                    titulo = partes[0].trim();
+                    textoParaConverter = partes.slice(1).join(':').trim();
+                    resultado += `<p class="negrito">${titulo.toUpperCase()}:</p>`;
                 }
+
+                // Remove espaços extras antes dos dois pontos
+                textoParaConverter = textoParaConverter.replace(/\s+:/g, ':');
+                // Mantém apenas um espaço após os dois pontos, se houver algum
+                textoParaConverter = textoParaConverter.replace(/:\s*/g, ': ');
+
+                const palavras = textoParaConverter.split(' ');
+                let linhaFormatada = palavras.map(palavra => {
+                    return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase();
+                }).join(' ');
+                resultado += `<p style="line-height: 1.3; margin-bottom: 0.5em;">${linhaFormatada}</p>`;
             });
             return resultado;
         }
@@ -127,6 +151,11 @@
                 console.error('Falha ao copiar texto: ', err);
                 alert('Falha ao copiar texto. Por favor, copie manualmente.');
             });
+        });
+
+        // Adiciona event listener para o botão de resetar texto
+        resetarTextoBtn.addEventListener('click', () => {
+            textoSaida.innerHTML = '';
         });
     </script>
 </body>
