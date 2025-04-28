@@ -2,13 +2,17 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width, initial-scale=1.0">
     <title>Internato FG</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Google Sans', 'Inter', sans-serif; /* Prioriza Google Sans, fallback para Inter */
+        }
+        .negrito {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -81,13 +85,13 @@
     </div>
 
     <script>
-       const paginaInicial = document.getElementById('pagina-inicial');
+        const paginaInicial = document.getElementById('pagina-inicial');
         const paginaConversor = document.getElementById('pagina-conversor');
         const paginaControles = document.getElementById('pagina-controles');
         const irParaConversor = document.getElementById('ir-para-conversor');
         const irParaControles = document.getElementById('ir-para-controles');
         const voltarParaInicio = document.getElementById('voltar-para-inicio');
-         const voltarParaInicioControles = document.getElementById('voltar-para-inicio-controles');
+        const voltarParaInicioControles = document.getElementById('voltar-para-inicio-controles');
         const textoEntrada = document.getElementById('texto-entrada');
         const textoSaida = document.getElementById('texto-saida');
         const converterTexto = document.getElementById('converter-texto');
@@ -95,32 +99,43 @@
         const textoSaidaImagem = document.getElementById('texto-saida-imagem');
         const extrairDados = document.getElementById('extrair-dados');
 
+        // Função para capitalizar o texto, preservando a formatação original
         function capitalizarTexto(texto) {
             if (!texto) return "";
 
-            const frases = texto.toLowerCase().split('. ');
-            const resultado = frases.map(frase => {
-                const palavras = frase.split(' ');
-                const primeiraPalavra = palavras[0].charAt(0).toUpperCase() + palavras[0].slice(1);
-                const restoDaFrase = palavras.slice(1).join(' ');
-                return primeiraPalavra + (restoDaFrase ? ' ' + restoDaFrase : '');
-            }).join('. ');
+            // Divide o texto em parágrafos, considerando quebras de linha duplas como separadores
+            const paragrafos = texto.split(/\n\s*\n/);
+            let resultado = "";
 
-             const palavras = resultado.split(' ');
-             const resultadoFinal = palavras.map(palavra => {
-                if (palavra.startsWith('#')) {
-                    return palavra;
-                } else {
-                    return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+            paragrafos.forEach((paragrafo, index) => {
+                let linhaResultado = "";
+                // Divide cada parágrafo em linhas
+                const linhas = paragrafo.split('\n');
+                linhas.forEach((linha, linhaIndex) => {
+                    linha = linha.trim();
+                    if (linha.startsWith('#')) {
+                        // Mantém títulos em CAPS LOCK
+                        linhaResultado += linha.toUpperCase();
+                    } else {
+                        // Mantém a capitalização original das outras linhas
+                        linhaResultado += linha;
+                    }
+                    if (linhaIndex < linhas.length - 1) {
+                        linhaResultado += '<br>'; // Adiciona <br> para quebras de linha dentro do parágrafo
+                    }
+                });
+                resultado += linhaResultado;
+                if (index < paragrafos.length - 1) {
+                    resultado += '</p><p>';  // Adiciona </p><p> entre os parágrafos
                 }
-            }).join(' ');
-            return resultadoFinal;
+            });
+            return '<p>' + resultado + '</p>'; // Envolve o resultado em <p> tags
         }
 
         irParaConversor.addEventListener('click', () => {
             paginaInicial.classList.add('hidden');
             paginaConversor.classList.remove('hidden');
-             paginaControles.classList.add('hidden');
+            paginaControles.classList.add('hidden');
         });
 
         irParaControles.addEventListener('click', () => {
@@ -133,69 +148,81 @@
             paginaConversor.classList.add('hidden');
             paginaInicial.classList.remove('hidden');
             textoEntrada.value = '';
-            textoSaida.textContent = '';
+            textoSaida.innerHTML = ''; // Limpa o conteúdo de textoSaida
         });
 
         voltarParaInicioControles.addEventListener('click', () => {
             paginaControles.classList.add('hidden');
             paginaInicial.classList.remove('hidden');
             imagemEntrada.value = '';
-            textoSaidaImagem.textContent = '';
+            textoSaidaImagem.innerHTML = ''; // Limpa o conteúdo de textoSaidaImagem
         });
 
-        converterTexto.addEventListener('click', () => {
+        converterTexto.addEventListener('click', () => { // Corrigido para 'converterTexto'
             const textoParaConverter = textoEntrada.value;
             const textoConvertido = capitalizarTexto(textoParaConverter);
-            textoSaida.textContent = textoConvertido;
+            textoSaida.innerHTML = textoConvertido; // Usa innerHTML para renderizar HTML
         });
 
-        extrairDados.addEventListener('click', () => {
+        extrairDados.addEventListener('click', () => { // Corrigido para 'extrairDados'
             const imagem = imagemEntrada.files[0];
             if (imagem) {
-                // Simula a extração de dados da imagem (substitua com sua lógica real)
                 const dadosExtraidos = extrairDadosDaImagem(imagem);
-                textoSaidaImagem.textContent = dadosExtraidos; // Exibe os dados formatados
+                textoSaidaImagem.innerHTML = dadosExtraidos;
             } else {
                 textoSaidaImagem.textContent = "Nenhuma imagem selecionada.";
             }
         });
 
         function extrairDadosDaImagem(imagem) {
-            // *** Substitua esta função com sua lógica real de extração de dados da imagem ***
-            // Esta é apenas uma simulação para formatar a saída como nos exemplos da conversa.
-            // Você precisará usar uma biblioteca de OCR (como Tesseract.js) ou uma API de serviço de OCR
-            // para extrair texto de imagens reais.
+            // Simulação de extração de dados da imagem
+            const textoSimulado = `# Evolução Hematologia - 12/04/2025 #
 
-            // Simulação de dados extraídos (para fins de demonstração)
-            const nomeArquivo = imagem.name;
-            const tamanho = imagem.size;
-            const tipo = imagem.type;
+Paciente : Deilton Fernandes Costa
+Idade : 33 Anos
+Prontuário : 11050234
+Mae : Marlene Herminio Fernandes
+Dn : 10/04/1992
 
-            const dadosSimulados = [
-                "Nome do Arquivo: " + nomeArquivo,
-                "Tamanho: " + tamanho + " bytes",
-                "Tipo: " + tipo,
-                "Data de Extração: " + new Date().toLocaleString(),
-                "Dados Encontrados:",
-                "Nome: Fulano de Tal",
-                "Idade: 30 anos",
-                "Endereço: Rua Principal, 123",
-                "Telefone: (12) 3456-7890",
-                "Informações Adicionais:",
-                "- Possui alergia a penicilina",
-                "- Histórico de hipertensão",
-                "- Não faz uso de medicamentos contínuos"
-            ];
+# Diagnóstico :
+1 ) Linfoma Difuso De Grandes Células B  ( dx :
+Julho / 2024 ) - Ec lii Bx >> Ap Bx Linfonodo ( 23/08/24 ) : Normocelular Para
+A Idade Da Paciente , Constituida Por Células Das Tres Linhagens
+Hematopoeticas , Com Escalonamento Maturativo Preservado >> Ihq De
+Bióngio Por Agulha Grossa De Linfonodo Cervical / Mediastinal ( caps )
+`;
+            const linhas = textoSimulado.split('\n');
+            let resultado = '';
+            let dentroDeDiagnostico = false;
+            let paragrafoAnterior = ''; // Variável para controlar o parágrafo anterior
 
-            // Formata a saída para se assemelhar aos exemplos da conversa
-            let resultado = "";
-            dadosSimulados.forEach(linha => {
-                if (linha.startsWith("-")) {
-                    resultado += linha + "\n";
-                } else if (linha.includes(":")) {
-                    resultado += linha + "\n";
+            linhas.forEach(linha => {
+                linha = linha.trim();
+
+                if (linha.startsWith('#')) {
+                    resultado += `<p class="negrito">${linha.toUpperCase()}</p>`; // Converte títulos para maiúsculo
+                    dentroDeDiagnostico = linha.includes('Diagnóstico');
+                    paragrafoAnterior = 'titulo'; // Marca o parágrafo anterior como título
+                } else if (linha === '') {
+                    if (paragrafoAnterior !== '') {
+                        resultado += '<br>'; // Adiciona quebra de linha se o parágrafo anterior não for vazio
+                    }
+                    paragrafoAnterior = ''; // Reseta o parágrafo anterior
+                } else if (linha.startsWith('Paciente') || linha.startsWith('Idade') || linha.startsWith('Prontuário') || linha.startsWith('Mae') || linha.startsWith('Dn')) {
+                    resultado += `<p><span class="negrito">${linha}</span></p>`;
+                    paragrafoAnterior = 'identificacao';
+                } else if (dentroDeDiagnostico && (linha.startsWith('1)') || linha.startsWith('2)')) {
+                    resultado += `<p><span class="negrito">${linha}</span></p>`;
+                    paragrafoAnterior = 'diagnostico_principal';
+                } else if (linha.startsWith('-')) {
+                    resultado += `<p>${linha}</p>`;
+                    paragrafoAnterior = 'item_lista';
                 } else {
-                    resultado += linha + "\n";
+                    // Remove a capitalização da primeira letra
+                    const primeiraLetra = linha.charAt(0);
+                    const restoDaLinha = linha.slice(1);
+                     resultado += `<p>${primeiraLetra.toLowerCase() + restoDaLinha}</p>`;
+                    paragrafoAnterior = 'texto';
                 }
             });
             return resultado;
