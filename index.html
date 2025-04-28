@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Texto</title>
+    <title>Internato FG</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,8 +12,31 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="container mx-auto max-w-2xl bg-white rounded-lg shadow-md p-8">
+<body class="bg-gray-100">
+    <header class="bg-blue-500 text-white py-4">
+        <div class="container mx-auto text-center">
+            <h1 class="text-2xl font-semibold">Internato UFG</h1>
+        </div>
+    </header>
+
+    <div id="pagina-inicial" class="container mx-auto max-w-2xl bg-white rounded-lg shadow-md p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-semibold text-blue-600 uppercase">Bem-vindo ao Internato UFG</h1>
+        </header>
+        <main class="text-center space-y-4">
+            <p class="text-lg text-gray-700">Uma forma de simplificar sua vida no estágio final da faculdade.</p>
+            <div class="flex justify-center">
+                <button id="ir-para-conversor" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-4">
+                    Converter Texto
+                </button>
+                <button id="ir-para-controles" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Extrair Dados da Imagem
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div id="pagina-conversor" class="container mx-auto max-w-2xl bg-white rounded-lg shadow-md p-8 hidden">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-semibold text-blue-600 uppercase">Conversor de Texto</h1>
         </header>
@@ -24,6 +47,9 @@
             </section>
             <section class="text-center">
                 <button id="converter-texto" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Converter para Texto Normal</button>
+                 <button id="voltar-para-inicio" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Voltar para Início
+                </button>
             </section>
             <section>
                 <label for="texto-saida" class="block text-gray-700 text-sm font-bold mb-2">Texto convertido:</label>
@@ -32,26 +58,148 @@
         </main>
     </div>
 
+    <div id="pagina-controles" class="container mx-auto max-w-2xl bg-white rounded-lg shadow-md p-8 hidden">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-semibold text-blue-600 uppercase">Extrair Dados da Imagem</h1>
+        </header>
+        <main class="space-y-6">
+            <section>
+                <label for="imagem-entrada" class="block text-gray-700 text-sm font-bold mb-2">Selecione a imagem:</label>
+                <input type="file" id="imagem-entrada" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </section>
+            <section class="text-center">
+                <button id="extrair-dados" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Extrair Dados</button>
+                 <button id="voltar-para-inicio-controles" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Voltar para Início
+                </button>
+            </section>
+            <section>
+                <label for="texto-saida-imagem" class="block text-gray-700 text-sm font-bold mb-2">Dados extraídos:</label>
+                <div id="texto-saida-imagem" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto rounded-md"></div>
+            </section>
+        </main>
+    </div>
+
     <script>
+       const paginaInicial = document.getElementById('pagina-inicial');
+        const paginaConversor = document.getElementById('pagina-conversor');
+        const paginaControles = document.getElementById('pagina-controles');
+        const irParaConversor = document.getElementById('ir-para-conversor');
+        const irParaControles = document.getElementById('ir-para-controles');
+        const voltarParaInicio = document.getElementById('voltar-para-inicio');
+         const voltarParaInicioControles = document.getElementById('voltar-para-inicio-controles');
         const textoEntrada = document.getElementById('texto-entrada');
         const textoSaida = document.getElementById('texto-saida');
         const converterTexto = document.getElementById('converter-texto');
+        const imagemEntrada = document.getElementById('imagem-entrada');
+        const textoSaidaImagem = document.getElementById('texto-saida-imagem');
+        const extrairDados = document.getElementById('extrair-dados');
 
         function capitalizarTexto(texto) {
             if (!texto) return "";
-            
-            const palavras = texto.toLowerCase().split(' ');
-            const resultado = palavras.map(palavra => {
-                return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+
+            const frases = texto.toLowerCase().split('. ');
+            const resultado = frases.map(frase => {
+                const palavras = frase.split(' ');
+                const primeiraPalavra = palavras[0].charAt(0).toUpperCase() + palavras[0].slice(1);
+                const restoDaFrase = palavras.slice(1).join(' ');
+                return primeiraPalavra + (restoDaFrase ? ' ' + restoDaFrase : '');
+            }).join('. ');
+
+             const palavras = resultado.split(' ');
+             const resultadoFinal = palavras.map(palavra => {
+                if (palavra.startsWith('#')) {
+                    return palavra;
+                } else {
+                    return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+                }
             }).join(' ');
-            return resultado;
+            return resultadoFinal;
         }
+
+        irParaConversor.addEventListener('click', () => {
+            paginaInicial.classList.add('hidden');
+            paginaConversor.classList.remove('hidden');
+             paginaControles.classList.add('hidden');
+        });
+
+        irParaControles.addEventListener('click', () => {
+            paginaInicial.classList.add('hidden');
+            paginaControles.classList.remove('hidden');
+            paginaConversor.classList.add('hidden');
+        });
+
+        voltarParaInicio.addEventListener('click', () => {
+            paginaConversor.classList.add('hidden');
+            paginaInicial.classList.remove('hidden');
+            textoEntrada.value = '';
+            textoSaida.textContent = '';
+        });
+
+        voltarParaInicioControles.addEventListener('click', () => {
+            paginaControles.classList.add('hidden');
+            paginaInicial.classList.remove('hidden');
+            imagemEntrada.value = '';
+            textoSaidaImagem.textContent = '';
+        });
 
         converterTexto.addEventListener('click', () => {
             const textoParaConverter = textoEntrada.value;
             const textoConvertido = capitalizarTexto(textoParaConverter);
             textoSaida.textContent = textoConvertido;
         });
+
+        extrairDados.addEventListener('click', () => {
+            const imagem = imagemEntrada.files[0];
+            if (imagem) {
+                // Simula a extração de dados da imagem (substitua com sua lógica real)
+                const dadosExtraidos = extrairDadosDaImagem(imagem);
+                textoSaidaImagem.textContent = dadosExtraidos; // Exibe os dados formatados
+            } else {
+                textoSaidaImagem.textContent = "Nenhuma imagem selecionada.";
+            }
+        });
+
+        function extrairDadosDaImagem(imagem) {
+            // *** Substitua esta função com sua lógica real de extração de dados da imagem ***
+            // Esta é apenas uma simulação para formatar a saída como nos exemplos da conversa.
+            // Você precisará usar uma biblioteca de OCR (como Tesseract.js) ou uma API de serviço de OCR
+            // para extrair texto de imagens reais.
+
+            // Simulação de dados extraídos (para fins de demonstração)
+            const nomeArquivo = imagem.name;
+            const tamanho = imagem.size;
+            const tipo = imagem.type;
+
+            const dadosSimulados = [
+                "Nome do Arquivo: " + nomeArquivo,
+                "Tamanho: " + tamanho + " bytes",
+                "Tipo: " + tipo,
+                "Data de Extração: " + new Date().toLocaleString(),
+                "Dados Encontrados:",
+                "Nome: Fulano de Tal",
+                "Idade: 30 anos",
+                "Endereço: Rua Principal, 123",
+                "Telefone: (12) 3456-7890",
+                "Informações Adicionais:",
+                "- Possui alergia a penicilina",
+                "- Histórico de hipertensão",
+                "- Não faz uso de medicamentos contínuos"
+            ];
+
+            // Formata a saída para se assemelhar aos exemplos da conversa
+            let resultado = "";
+            dadosSimulados.forEach(linha => {
+                if (linha.startsWith("-")) {
+                    resultado += linha + "\n";
+                } else if (linha.includes(":")) {
+                    resultado += linha + "\n";
+                } else {
+                    resultado += linha + "\n";
+                }
+            });
+            return resultado;
+        }
     </script>
 </body>
 </html>
