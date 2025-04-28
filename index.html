@@ -9,10 +9,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Google Sans', 'Inter', sans-serif; /* Prioriza Google Sans, fallback para Inter */
+            font-family: 'Google Sans', 'Inter', sans-serif;
         }
         .negrito {
             font-weight: bold;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .quebra-linha {
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -32,9 +38,6 @@
             <div class="flex justify-center">
                 <button id="ir-para-conversor" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-4">
                     Converter Texto
-                </button>
-                <button id="ir-para-controles" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Extrair Dados da Imagem
                 </button>
             </div>
         </main>
@@ -57,29 +60,8 @@
             </section>
             <section>
                 <label for="texto-saida" class="block text-gray-700 text-sm font-bold mb-2">Texto convertido:</label>
-                <div id="texto-saida" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto rounded-md"></div>
-            </section>
-        </main>
-    </div>
-
-    <div id="pagina-controles" class="container mx-auto max-w-2xl bg-white rounded-lg shadow-md p-8 hidden">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-semibold text-blue-600 uppercase">Extrair Dados da Imagem</h1>
-        </header>
-        <main class="space-y-6">
-            <section>
-                <label for="imagem-entrada" class="block text-gray-700 text-sm font-bold mb-2">Selecione a imagem:</label>
-                <input type="file" id="imagem-entrada" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </section>
-            <section class="text-center">
-                <button id="extrair-dados" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Extrair Dados</button>
-                 <button id="voltar-para-inicio-controles" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Voltar para Início
-                </button>
-            </section>
-            <section>
-                <label for="texto-saida-imagem" class="block text-gray-700 text-sm font-bold mb-2">Dados extraídos:</label>
-                <div id="texto-saida-imagem" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto rounded-md"></div>
+                <div id="texto-saida" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto quebra-linha rounded-md"></div>
+                <button id="copiar-texto" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Copiar Texto</button>
             </section>
         </main>
     </div>
@@ -87,146 +69,65 @@
     <script>
         const paginaInicial = document.getElementById('pagina-inicial');
         const paginaConversor = document.getElementById('pagina-conversor');
-        const paginaControles = document.getElementById('pagina-controles');
         const irParaConversor = document.getElementById('ir-para-conversor');
-        const irParaControles = document.getElementById('ir-para-controles');
         const voltarParaInicio = document.getElementById('voltar-para-inicio');
-        const voltarParaInicioControles = document.getElementById('voltar-para-inicio-controles');
         const textoEntrada = document.getElementById('texto-entrada');
         const textoSaida = document.getElementById('texto-saida');
         const converterTexto = document.getElementById('converter-texto');
-        const imagemEntrada = document.getElementById('imagem-entrada');
-        const textoSaidaImagem = document.getElementById('texto-saida-imagem');
-        const extrairDados = document.getElementById('extrair-dados');
+        const copiarTextoBtn = document.getElementById('copiar-texto');
 
         // Função para capitalizar o texto, preservando a formatação original
         function capitalizarTexto(texto) {
             if (!texto) return "";
 
-            // Divide o texto em parágrafos, considerando quebras de linha duplas como separadores
-            const paragrafos = texto.split(/\n\s*\n/);
+            const linhas = texto.split('\n');
             let resultado = "";
 
-            paragrafos.forEach((paragrafo, index) => {
-                let linhaResultado = "";
-                // Divide cada parágrafo em linhas
-                const linhas = paragrafo.split('\n');
-                linhas.forEach((linha, linhaIndex) => {
-                    linha = linha.trim();
-                    if (linha.startsWith('#')) {
-                        // Mantém títulos em CAPS LOCK
-                        linhaResultado += linha.toUpperCase();
-                    } else {
-                        // Mantém a capitalização original das outras linhas
-                        linhaResultado += linha;
-                    }
-                    if (linhaIndex < linhas.length - 1) {
-                        linhaResultado += '<br>'; // Adiciona <br> para quebras de linha dentro do parágrafo
-                    }
-                });
-                resultado += linhaResultado;
-                if (index < paragrafos.length - 1) {
-                    resultado += '</p><p>';  // Adiciona </p><p> entre os parágrafos
+            linhas.forEach((linha, linhaIndex) => {
+                linha = linha.trim();
+                if (linha.startsWith('#')) {
+                    resultado += `<p class="negrito">${linha.toUpperCase()}</p>`;
+                } else {
+                    const palavras = linha.split(' ');
+                    let linhaFormatada = palavras.map(palavra => {
+                        return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase();
+                    }).join(' ');
+                    resultado +=  `<p style="margin-bottom: 1em;">${linhaFormatada}</p>`;
                 }
             });
-            return '<p>' + resultado + '</p>'; // Envolve o resultado em <p> tags
+            return resultado;
         }
 
+        // Adiciona event listeners para os botões de navegação
         irParaConversor.addEventListener('click', () => {
             paginaInicial.classList.add('hidden');
             paginaConversor.classList.remove('hidden');
-            paginaControles.classList.add('hidden');
-        });
-
-        irParaControles.addEventListener('click', () => {
-            paginaInicial.classList.add('hidden');
-            paginaControles.classList.remove('hidden');
-            paginaConversor.classList.add('hidden');
         });
 
         voltarParaInicio.addEventListener('click', () => {
             paginaConversor.classList.add('hidden');
             paginaInicial.classList.remove('hidden');
             textoEntrada.value = '';
-            textoSaida.innerHTML = ''; // Limpa o conteúdo de textoSaida
+            textoSaida.innerHTML = '';
         });
 
-        voltarParaInicioControles.addEventListener('click', () => {
-            paginaControles.classList.add('hidden');
-            paginaInicial.classList.remove('hidden');
-            imagemEntrada.value = '';
-            textoSaidaImagem.innerHTML = ''; // Limpa o conteúdo de textoSaidaImagem
-        });
-
-        converterTexto.addEventListener('click', () => { // Corrigido para 'converterTexto'
+        // Adiciona event listener para o botão de conversão de texto
+        converterTexto.addEventListener('click', () => {
             const textoParaConverter = textoEntrada.value;
             const textoConvertido = capitalizarTexto(textoParaConverter);
-            textoSaida.innerHTML = textoConvertido; // Usa innerHTML para renderizar HTML
+            textoSaida.innerHTML = textoConvertido;
         });
 
-        extrairDados.addEventListener('click', () => { // Corrigido para 'extrairDados'
-            const imagem = imagemEntrada.files[0];
-            if (imagem) {
-                const dadosExtraidos = extrairDadosDaImagem(imagem);
-                textoSaidaImagem.innerHTML = dadosExtraidos;
-            } else {
-                textoSaidaImagem.textContent = "Nenhuma imagem selecionada.";
-            }
-        });
-
-        function extrairDadosDaImagem(imagem) {
-            // Simulação de extração de dados da imagem
-            const textoSimulado = `# Evolução Hematologia - 12/04/2025 #
-
-Paciente : Deilton Fernandes Costa
-Idade : 33 Anos
-Prontuário : 11050234
-Mae : Marlene Herminio Fernandes
-Dn : 10/04/1992
-
-# Diagnóstico :
-1 ) Linfoma Difuso De Grandes Células B  ( dx :
-Julho / 2024 ) - Ec lii Bx >> Ap Bx Linfonodo ( 23/08/24 ) : Normocelular Para
-A Idade Da Paciente , Constituida Por Células Das Tres Linhagens
-Hematopoeticas , Com Escalonamento Maturativo Preservado >> Ihq De
-Bióngio Por Agulha Grossa De Linfonodo Cervical / Mediastinal ( caps )
-`;
-            const linhas = textoSimulado.split('\n');
-            let resultado = '';
-            let dentroDeDiagnostico = false;
-            let paragrafoAnterior = ''; // Variável para controlar o parágrafo anterior
-
-            linhas.forEach(linha => {
-                linha = linha.trim();
-
-                if (linha.startsWith('#')) {
-                    resultado += `<p class="negrito">${linha.toUpperCase()}</p>`; // Converte títulos para maiúsculo
-                    dentroDeDiagnostico = linha.includes('Diagnóstico');
-                    paragrafoAnterior = 'titulo'; // Marca o parágrafo anterior como título
-                } else if (linha === '') {
-                    if (paragrafoAnterior !== '') {
-                        resultado += '<br>'; // Adiciona quebra de linha se o parágrafo anterior não for vazio
-                    }
-                    paragrafoAnterior = ''; // Reseta o parágrafo anterior
-                } else if (linha.startsWith('Paciente') || linha.startsWith('Idade') || linha.startsWith('Prontuário') || linha.startsWith('Mae') || linha.startsWith('Dn')) {
-                    resultado += `<p><span class="negrito">${linha}</span></p>`;
-                    paragrafoAnterior = 'identificacao';
-                } else if (dentroDeDiagnostico && (linha.startsWith('1)') || linha.startsWith('2)')) {
-                    resultado += `<p><span class="negrito">${linha}</span></p>`;
-                    paragrafoAnterior = 'diagnostico_principal';
-                } else if (linha.startsWith('-')) {
-                    resultado += `<p>${linha}</p>`;
-                    paragrafoAnterior = 'item_lista';
-                } else {
-                    // Remove a capitalização da primeira letra
-                    const primeiraLetra = linha.charAt(0);
-                    const restoDaLinha = linha.slice(1);
-                     resultado += `<p>${primeiraLetra.toLowerCase() + restoDaLinha}</p>`;
-                    paragrafoAnterior = 'texto';
-                }
+        // Adiciona event listener para o botão de copiar texto
+        copiarTextoBtn.addEventListener('click', () => {
+            const textoParaCopiar = textoSaida.innerText;
+            navigator.clipboard.writeText(textoParaCopiar).then(() => {
+                alert('Texto copiado para a área de transferência!');
+            }).catch(err => {
+                console.error('Falha ao copiar texto: ', err);
+                alert('Falha ao copiar texto. Por favor, copie manualmente.');
             });
-            return resultado;
-        }
+        });
     </script>
 </body>
 </html>
