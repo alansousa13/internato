@@ -3,227 +3,779 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internato FG</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Aviso de Cirurgia de Urgência</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://em-content.zobj.net/source/apple/419/memo_1f4dd.png">
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-color: #e0e0e0;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --text-color: #212529;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --input-bg: #f8f9fa;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #4895ef;
+            --secondary-color: #4361ee;
+            --light-color: #121212;
+            --dark-color: #f8f9fa;
+            --border-color: #333333;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --text-color: #e0e0e0;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --input-bg: #2d2d2d;
+        }
+        
         body {
-            font-family: 'Google Sans', 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .negrito {
-            font-weight: bold;
+        
+        .container {
+            max-width: 1200px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem auto;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
-        p {
-            margin-bottom: 0.5em;
+        
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-        .quebra-linha {
-            white-space: pre-wrap;
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
         }
-        #texto-saida:focus {
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: left;
+            font-size: 2rem;
+            padding-bottom: 1rem;
+        }
+        
+        .form-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-title {
+            color: var(--secondary-color);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            position: relative;
+            padding-left: 1rem;
+            text-align: left;
+        }
+        
+        .form-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-color);
+            border-radius: 4px;
+            text-align: left;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--light-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .input-group-text {
+            background-color: var(--light-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                text-align: left;
+            }
+        }
+
+        * {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .underline-input {
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0;
+            background-color: transparent;
+            padding: 0.25rem 0;
+            width: auto;
+            display: inline-block;
+        }
+
+        .underline-input:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-bottom: 2px solid var(--primary-color);
         }
-        #texto-saida p {
-           line-height: 1.3;
-           margin-bottom: 0.5em;
+
+        .section-title {
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--primary-color);
         }
-        /* Dark Mode Styles */
-        .dark-mode {
-            background-color: #1a202c;
-            color: #e2e8f0;
-        }
-        .dark-mode .dark\:bg-gray-800 {
-            background-color: #2d3748;
-        }
-        .dark-mode .dark\:text-white {
-            color: #f7fafc;
-        }
-        .dark-mode .dark\:bg-gray-700 {
-            background-color: #4a5568;
-        }
-        .dark-mode .dark\:border-gray-600 {
-            border-color: #718096;
-        }
-        .dark-mode .dark\:bg-blue-600 {
-            background-color: #2b6cb0;
-        }
-        .dark-mode .dark\:bg-green-600 {
-            background-color: #25855a;
-        }
-        .dark-mode .dark\:bg-red-600 {
-            background-color: #c53030;
-        }
-        .dark-mode .dark\:bg-blue-500 {
-            background-color: #3182ce;
-        }
-        .sigla-medica {
-            text-transform: uppercase;
-            font-size: 0.95em;
-            letter-spacing: 0.5px;
-        }
-        .valor-medico {
-            font-family: monospace;
-        }
-        .nome-pessoa {
-            text-transform: capitalize;
+
+        .signature-line {
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+            padding-top: 5px;
+            text-align: center;
+            font-size: 0.8rem;
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <header class="bg-blue-500 text-white py-4">
-        <div class="container mx-auto flex justify-between items-center px-4">
-            <h1 class="text-2xl font-semibold">Internato UFG</h1>
-            <button id="toggle-dark-mode" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline">
-                🌙 Dark Mode
-            </button>
-        </div>
-    </header>
-
-    <div id="pagina-inicial" class="container mx-auto max-w-4xl bg-white rounded-lg shadow-md p-8 mt-6">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-semibold text-blue-600 dark:text-blue-400 uppercase">Bem-vindo ao Internato UFG</h1>
-        </header>
-        <main class="text-center space-y-4">
-            <p class="text-lg text-gray-700 dark:text-gray-300">Uma forma de simplificar sua vida no estágio final da faculdade.</p>
-            <div class="flex justify-center">
-                <button id="ir-para-conversor" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-4 dark:bg-green-600 dark:hover:bg-green-800">
-                    Converter Texto
-                </button>
-            </div>
-        </main>
-    </div>
-
-    <div id="pagina-conversor" class="container mx-auto max-w-4xl bg-white rounded-lg shadow-md p-8 mt-6 hidden dark:bg-gray-800">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-semibold text-blue-600 dark:text-blue-400 uppercase">Conversor de Texto</h1>
-        </header>
-        <main class="space-y-6">
-            <section>
-                <label for="texto-entrada" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Cole seu texto em CAIXA ALTA aqui:</label>
-                <textarea id="texto-entrada" placeholder="INSIRA SEU TEXTO EM CAIXA ALTA" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-48 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 font-mono"></textarea>
-            </section>
-            <section class="text-center">
-                <button id="voltar-para-inicio" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline dark:bg-blue-600 dark:hover:bg-blue-800">
-                    Voltar para Início
-                </button>
-            </section>
-            <section>
-                <label for="texto-saida" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Texto convertido:</label>
-                <div id="texto-saida" contenteditable="true" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-50 h-48 overflow-auto quebra-linha rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"></div>
-                <div class="flex justify-center space-x-4 mt-4">
-                    <button id="copiar-texto" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline dark:bg-blue-600 dark:hover:bg-blue-800">Copiar Texto</button>
-                    <button id="resetar-texto" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline dark:bg-red-600 dark:hover:bg-red-800">Resetar Texto</button>
+<body>
+    <div class="container">
+        <h1 class="text-left mb-4">Aviso de Cirurgia de Urgência</h1>
+        
+        <div class="form-section">
+            <h3 class="form-title">Dados do Paciente</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nome" class="form-label">Nome Completo</label>
+                    <input type="text" class="form-control" id="nome" required>
                 </div>
-            </section>
-        </main>
-    </div>
-
-    <script>
-        // Seleção de elementos
-        const paginaInicial = document.getElementById('pagina-inicial');
-        const paginaConversor = document.getElementById('pagina-conversor');
-        const irParaConversor = document.getElementById('ir-para-conversor');
-        const voltarParaInicio = document.getElementById('voltar-para-inicio');
-        const textoEntrada = document.getElementById('texto-entrada');
-        const textoSaida = document.getElementById('texto-saida');
-        const copiarTextoBtn = document.getElementById('copiar-texto');
-        const resetarTextoBtn = document.getElementById('resetar-texto');
-        const toggleDarkMode = document.getElementById('toggle-dark-mode');
-
-        // Função para alternar entre páginas
-        function mostrarPaginaConversor() {
-            paginaInicial.classList.add('hidden');
-            paginaConversor.classList.remove('hidden');
-            textoEntrada.focus();
-        }
-
-        function mostrarPaginaInicial() {
-            paginaConversor.classList.add('hidden');
-            paginaInicial.classList.remove('hidden');
-            textoEntrada.value = '';
-            textoSaida.innerHTML = '';
-        }
-
-        // Event listeners para navegação
-        irParaConversor.addEventListener('click', mostrarPaginaConversor);
-        voltarParaInicio.addEventListener('click', mostrarPaginaInicial);
-
-        // Lista de siglas médicas (reduzida para exemplo)
-        const siglasMedicas = ['IAM', 'HAS', 'PCR', 'COVID', 'HIV', 'AVC', 'TEP', 'DRC', 'HGT', 'FO', 'VO', 'EV'];
-
-        // Função simplificada para formatar texto
-        function formatarTexto(texto) {
-            if (!texto) return "";
+                <div class="col-md-3">
+                    <label for="idade" class="form-label">Idade</label>
+                    <input type="number" class="form-control" id="idade">
+                </div>
+                <div class="col-md-3">
+                    <label for="peso" class="form-label">Peso (kg)</label>
+                    <input type="number" class="form-control" id="peso">
+                </div>
+            </div>
             
-            return texto.split('\n').map(linha => {
-                linha = linha.trim();
-                if (!linha) return "<p><br></p>";
-                
-                // Se for um título (começa com #)
-                if (linha.startsWith('#')) {
-                    // Caso especial para nomes de pessoas
-                    if (linha.startsWith('#NOME:')) {
-                        const partes = linha.split(':');
-                        if (partes.length > 1) {
-                            const nomeFormatado = partes[1].trim().toLowerCase().split(' ')
-                                .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1))
-                                .join(' ');
-                            return `<p>#NOME: ${nomeFormatado}</p>`;
-                        }
-                    }
-                    return `<p>${linha}</p>`;
-                }
-                
-                // Sentence case básico
-                let linhaFormatada = linha.charAt(0).toUpperCase() + linha.slice(1).toLowerCase();
-                return `<p>${linhaFormatada}</p>`;
-            }).join('');
-        }
-
-        // Atualização em tempo real
-        textoEntrada.addEventListener('input', () => {
-            const textoParaConverter = textoEntrada.value;
-            const textoConvertido = formatarTexto(textoParaConverter);
-            textoSaida.innerHTML = textoConvertido;
-        });
-
-        // Copiar texto
-        copiarTextoBtn.addEventListener('click', () => {
-            const textoParaCopiar = textoSaida.innerText;
-            navigator.clipboard.writeText(textoParaCopiar).then(() => {
-                alert('Texto copiado para a área de transferência!');
-            }).catch(err => {
-                console.error('Falha ao copiar texto: ', err);
-                alert('Falha ao copiar texto. Por favor, copie manualmente.');
-            });
-        });
-
-        // Resetar texto
-        resetarTextoBtn.addEventListener('click', () => {
-            textoEntrada.value = '';
-            textoSaida.innerHTML = '';
-        });
-
-        // Dark Mode toggle
-        toggleDarkMode.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                toggleDarkMode.textContent = '☀️ Light Mode';
-                localStorage.setItem('darkMode', 'enabled');
-            } else {
-                toggleDarkMode.textContent = '🌙 Dark Mode';
-                localStorage.setItem('darkMode', 'disabled');
-            }
-        });
-
-        // Verificar preferência de dark mode ao carregar
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-            toggleDarkMode.textContent = '☀️ Light Mode';
-        }
-    </script>
-</body>
-</html>
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label class="form-label">Sexo</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sexo" id="mas" value="Masculino">
+                        <label class="form-check-label" for="mas">Masculino</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sexo" id="fem" value="Feminino">
+                        <label class="form-check-label" for="fem">Feminino</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="prontuario" class="form-label">Prontuário</label>
+                    <input type="text" class="form-control" id="prontuario">
+                </div>
+                <div class="col-md-6">
+                    <label for="nomeMae" class="form-label">Nome da Mãe</label>
+                    <input type="text" class="form-control" id="nomeMae">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="dataNascimento" class="form-label">Data de Nascimento</label>
+                    <input type="date" class="form-control" id="dataNascimento">
+                </div>
+                <div class="col-md-4">
+                    <label for="clinica" class="form-label">Clínica</label>
+                    <input type="text" class="form-control" id="clinica" value="EMERGÊNCIA">
+                </div>
+                <div class="col-md-4">
+                    <label for="leito" class="form-label">Leito</label>
+                    <input type="text" class="form-control" id="leito">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="especialidade" class="form-label">Especialidade</label>
+                    <input type="text" class="form-control" id="especialidade" value="CIRURGIA GERAL">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Estado geral do Cliente</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="estadoGeral" id="estadoBom" value="Bom">
+                            <label class="form-check-label" for="estadoBom">Bom</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="estadoGeral" id="estadoRegular" value="Regular" checked>
+                            <label class="form-check-label" for="estadoRegular">Regular</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="estadoGeral" id="estadoGrave" value="Grave">
+                            <label class="form-check-label" for="estadoGrave">Grave</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="form-title">Dados da Cirurgia</h3>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="dataCirurgia" class="form-label">Data da Cirurgia</label>
+                    <input type="date" class="form-control" id="dataCirurgia">
+                </div>
+                <div class="col-md-4">
+                    <label for="horaCirurgia" class="form-label">Horário</label>
+                    <input type="time" class="form-control" id="horaCirurgia">
+                </div>
+                <div class="col-md-4">
+                    <label for="duracaoEstimada" class="form-label">Duração estimada</label>
+                    <input type="time" class="form-control" id="duracaoEstimada">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="diagnostico" class="form-label">Diagnóstico</label>
+                    <input type="text" class="form-control" id="diagnostico">
+                </div>
+                <div class="col-md-3">
+                    <label for="cid" class="form-label">CID</label>
+                    <input type="text" class="form-control" id="cid" maxlength="4">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Cirurgia Oncológica</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="onco" id="oncoSim" value="Sim">
+                            <label class="form-check-label" for="oncoSim">Sim</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="onco" id="oncoNao" value="Não" checked>
+                            <label class="form-check-label" for="oncoNao">Não</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label for="cirurgiaProposta" class="form-label">Cirurgia Proposta</label>
+                    <input type="text" class="form-control" id="cirurgiaProposta">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label class="form-label">Potencial de contaminação da cirurgia</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="contLimpa" value="Limpa">
+                            <label class="form-check-label" for="contLimpa">Limpa</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="contContaminada" value="Contaminada">
+                            <label class="form-check-label" for="contContaminada">Contaminada</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="contPotencial" value="Potencialmente Contaminada" checked>
+                            <label class="form-check-label" for="contPotencial">Potencialmente Contaminada</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="contInfectante" value="Infectante">
+                            <label class="form-check-label" for="contInfectante">Infectante</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label class="form-label">Precauções</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="precPadrao" checked>
+                            <label class="form-check-label" for="precPadrao">Padrão</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="precContato">
+                            <label class="form-check-label" for="precContato">Contato</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="precAerossois">
+                            <label class="form-check-label" for="precAerossois">Aerossóis/Gotículas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="precCovid">
+                            <label class="form-check-label" for="precCovid">COVID</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Solicitação de reserva de vaga UTI</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="uti" id="utiSim" value="Sim" checked>
+                            <label class="form-check-label" for="utiSim">Sim</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="uti" id="utiNao" value="Não">
+                            <label class="form-check-label" for="utiNao">Não</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Solicitação de reserva de sangue</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sangue" id="sangueSim" value="Sim" checked>
+                            <label class="form-check-label" for="sangueSim">Sim</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sangue" id="sangueNao" value="Não">
+                            <label class="form-check-label" for="sangueNao">Não</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="form-title">Equipe Cirúrgica</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="cirurgiao" class="form-label">Cirurgião</label>
+                    <input type="text" class="form-control" id="cirurgiao">
+                </div>
+                <div class="col-md-3">
+                    <label for="crmCirurgiao" class="form-label">CRM</label>
+                    <input type="text" class="form-control" id="crmCirurgiao">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Instrumentador</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="instrumentador" id="instNao" value="Não" checked>
+                            <label class="form-check-label" for="instNao">Não</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="instrumentador" id="instSim" value="Sim">
+                            <label class="form-check-label" for="instSim">Sim</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="auxiliar1" class="form-label">1º Auxiliar</label>
+                    <input type="text" class="form-control" id="auxiliar1">
+                </div>
+                <div class="col-md-3">
+                    <label for="crmAuxiliar1" class="form-label">CRM</label>
+                    <input type="text" class="form-control" id="crmAuxiliar1">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="auxiliar2" class="form-label">2º Auxiliar</label>
+                    <input type="text" class="form-control" id="auxiliar2">
+                </div>
+                <div class="col-md-3">
+                    <label for="crmAuxiliar2" class="form-label">CRM</label>
+                    <input type="text" class="form-control" id="crmAuxiliar2">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="auxiliar3" class="form-label">3º Auxiliar</label>
+                    <input type="text" class="form-control" id="auxiliar3">
+                </div>
+                <div class="col-md-3">
+                    <label for="crmAuxiliar3" class="form-label">CRM</label>
+                    <input type="text" class="form-control" id="crmAuxiliar3">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="anestesiologista" class="form-label">Anestesiologista</label>
+                    <input type="text" class="form-control" id="anestesiologista">
+                </div>
+                <div class="col-md-3">
+                    <label for="crmAnestesiologista" class="form-label">CRM</label>
+                    <input type="text" class="form-control" id="crmAnestesiologista">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="instrumental" class="form-label">Instrumental cirúrgico</label>
+                    <input type="text" class="form-control" id="instrumental" value="CAIXA BASICA DA GERAL">
+                </div>
+                <div class="col-md-6">
+                    <label for="fios" class="form-label">Fios Cirúrgicos</label>
+                    <input type="text" class="form-control" id="fios">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label class="form-label">Reserva Equipamentos Específicos</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqBisturiArg">
+                            <label class="form-check-label" for="eqBisturiArg">Bisturi de Argônio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqBisturiElet" checked>
+                            <label class="form-check-label" for="eqBisturiElet">Bisturi Elétrico</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqEscopia">
+                            <label class="form-check-label" for="eqEscopia">Escopia</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqMicroOlympus">
+                            <label class="form-check-label" for="eqMicroOlympus">Microscópio Olympus</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqMicroZeiss">
+                            <label class="form-check-label" for="eqMicroZeiss">Microscópio Zeiss</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqMicroLeica">
+                            <label class="form-check-label" for="eqMicroLeica">Microscópio Leica</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqTorreVideo">
+                            <label class="form-check-label" for="eqTorreVideo">Torre de Vídeo</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eqUltrassom">
+                            <label class="form-check-label" for="eqUltrassom">Ultrassom</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="form-title">Justificativa para Realização do Procedimento de Urgência</h3>
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label for="justificativa" class="form-label">Justificativa</label>
+                    <textarea class="form-control" id="justificativa" rows="4"></textarea>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="medicoResponsavel" class="form-label">Médico responsável pelo preenchimento</label>
+                    <input type="text" class="form-control" id="medicoResponsavel">
+                </div>
+                <div class="col-md-6">
+                    <label for="crmResponsavel" class="form-label">CRM</label>
+                    <input type="text" class="form-control" id="crmResponsavel">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="especialidadeResponsavel" class="form-label">Especialidade</label>
+                    <input type="text" class="form-control" id="especialidadeResponsavel">
+                </div>
+                <div class="col-md-6">
+                    <label for="crmEstado" class="form-label">Estado do CRM</label>
+                    <input type="text" class="form-control" id="crmEstado">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="form-title">Anotações de Enfermagem no Trans-Operatório</h3>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="inicioOcupacao" class="form-label">Início de ocupação da sala cirúrgica (SC)</label>
+                    <input type="time" class="form-control" id="inicioOcupacao">
+                </div>
+                <div class="col-md-4">
+                    <label for="finalOcupacao" class="form-label">Final</label>
+                    <input type="time" class="form-control" id="finalOcupacao">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="entradaCliente" class="form-label">Entrada do cliente na (SC)</label>
+                    <input type="time" class="form-control" id="entradaCliente">
+                </div>
+                <div class="col-md-4">
+                    <label for="saidaCliente" class="form-label">Saída</label>
+                    <input type="time" class="form-control" id="saidaCliente">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="entradaAnestesiologista" class="form-label">Entrada do anestesiologista na (SC)</label>
+                    <input type="time" class="form-control" id="entradaAnestesiologista">
+                </div>
+                <div class="col-md-4">
+                    <label for="saidaAnestesiologista" class="form-label">Saída</label>
+                    <input type="time" class="form-control" id="saidaAnestesiologista">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="inicioAnestesia" class="form-label">Início da anestesia</label>
+                    <input type="time" class="form-control" id="inicioAnestesia">
+                </div>
+                <div class="col-md-4">
+                    <label for="finalAnestesia" class="form-label">Final</label>
+                    <input type="time" class="form-control" id="finalAnestesia">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="entradaCirurgiao" class="form-label">Entrada do cirurgião (SC)</label>
+                    <input type="time" class="form-control" id="entradaCirurgiao">
+                </div>
+                <div class="col-md-4">
+                    <label for="saidaCirurgiao" class="form-label">Saída</label>
+                    <input type="time" class="form-control" id="saidaCirurgiao">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="inicioCirurgia" class="form-label">Início da cirurgia</label>
+                    <input type="time" class="form-control" id="inicioCirurgia">
+                </div>
+                <div class="col-md-4">
+                    <label for="finalCirurgia" class="form-label">Final</label>
+                    <input type="time" class="form-control" id="finalCirurgia">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Tipo de anestesia: Asa</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="asa" id="asa1" value="I">
+                            <label class="form-check-label" for="asa1">I</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="asa" id="asa2" value="II">
+                            <label class="form-check-label" for="asa2">II</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="asa" id="asa3" value="III">
+                            <label class="form-check-label" for="asa3">III</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="asa" id="asa4" value="IV">
+                            <label class="form-check-label" for="asa4">IV</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="asa" id="asa5" value="V">
+                            <label class="form-check-label" for="asa5">V</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label for="cirurgiaRealizada" class="form-label">Cirurgia realizada</label>
+                    <input type="text" class="form-control" id="cirurgiaRealizada">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="localBisturi" class="form-label">Local da placa de bisturi</label>
+                    <input type="text" class="form-control" id="localBisturi">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Compressas usadas</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="compressas" id="compMedia" value="Médias">
+                            <label class="form-check-label" for="compMedia">Médias</label>
+                            <input type="number" class="form-control underline-input ms-2" style="width: 60px;" id="qtdMedia">
+                            <span class="ms-1">UN</span>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="compressas" id="compPequena" value="Pequenas">
+                            <label class="form-check-label" for="compPequena">Pequenas</label>
+                            <input type="number" class="form-control underline-input ms-2" style="width: 60px;" id="qtdPequena">
+                            <span class="ms-1">UN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Conferência de compressas</label>
+                    <div class="checkbox-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="confCompressas" id="confNao" value="Não">
+                            <label class="form-check-label" for="confNao">Não</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="confCompressas" id="confSim" value="Sim">
+                            <label class="form-check-label" for="confSim">Sim</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label for="obsCompressas" class="form-label">Obs.</label>
+                    <input type="text" class="form-control" id="obsCompressas">
+                </div>
+            </div>
+            
+           
