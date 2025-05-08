@@ -716,7 +716,7 @@
         async function loadPdfTemplate() {
             try {
                 // URL do modelo PDF (substitua pela URL correta)
-                const modelUrl = 'https://github.com/alansousa13/internato/blob/84deaf5a484fca645728ff28759b3660b5b0d59c/AVISO%2001%20-%20eletiva.pdf';
+                const modelUrl = 'https://raw.githubusercontent.com/alansousa13/internato/main/AVISO%2001%20-%20eletiva.pdf';
                 const response = await fetch(modelUrl);
                 if (!response.ok) throw new Error('Erro ao carregar modelo PDF');
                 return await response.arrayBuffer();
