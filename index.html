@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cirurgias HC</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Cirurgias HC - Formulário Eletivo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="https://em-content.zobj.net/source/apple/419/memo_1f4dd.png">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -180,13 +179,18 @@
             gap: 0.5rem;
         }
         
+        .btn {
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
         .btn-primary {
             background-color: var(--primary-color);
             border: none;
             padding: 0.75rem 1.5rem;
-            font-weight: 500;
             border-radius: 8px;
-            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(67, 97, 238, 0.3);
         }
         
         .btn-primary:hover {
@@ -197,7 +201,7 @@
         
         .btn-secondary {
             background-color: transparent;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
             color: var(--text-color);
             padding: 0.75rem 1.5rem;
             font-weight: 500;
@@ -216,6 +220,11 @@
             border-color: var(--primary-color);
         }
         
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 1.5rem;
@@ -226,31 +235,54 @@
                 font-size: 1.5rem;
                 text-align: left;
             }
+            
+            .checkbox-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
 
         * {
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
         }
+        
+        @media print {
+            .theme-switcher, .btn, .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+            
+            .container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-left mb-4">Cirurgias HC</h1>
+        <h1 class="text-left mb-4">Cirurgias HC - Formulário Eletivo</h1>
         
         <div class="form-section">
             <h3 class="form-title">Dados da Cirurgia</h3>
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="dataCirurgia" class="form-label">Data da Cirurgia</label>
+                    <label for="dataCirurgia" class="form-label required-field">Data da Cirurgia</label>
                     <input type="date" class="form-control" id="dataCirurgia" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="horario" class="form-label">Horário</label>
-                    <input type="time" class="form-control" id="horario">
+                    <label for="horario" class="form-label required-field">Horário</label>
+                    <input type="time" class="form-control" id="horario" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="prontuario" class="form-label">Prontuário</label>
-                    <input type="text" class="form-control" id="prontuario">
+                    <label for="prontuario" class="form-label required-field">Prontuário</label>
+                    <input type="text" class="form-control" id="prontuario" required>
                 </div>
                 <div class="col-md-3">
                     <label for="duracao" class="form-label">Duração estimada</label>
@@ -260,26 +292,26 @@
             
             <div class="row g-3 mt-3">
                 <div class="col-md-6">
-                    <label for="nomeCliente" class="form-label">Nome do Cliente</label>
-                    <input type="text" class="form-control" id="nomeCliente">
+                    <label for="nomeCliente" class="form-label required-field">Nome do Cliente</label>
+                    <input type="text" class="form-control" id="nomeCliente" required>
                 </div>
                 <div class="col-md-2">
-                    <label for="idade" class="form-label">Idade</label>
-                    <input type="text" class="form-control" id="idade">
+                    <label for="idade" class="form-label required-field">Idade</label>
+                    <input type="text" class="form-control" id="idade" required>
                 </div>
                 <div class="col-md-2">
                     <label for="peso" class="form-label">Peso</label>
                     <input type="text" class="form-control" id="peso">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Sexo</label>
+                    <label class="form-label required-field">Sexo</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="sexo" id="feminino" value="F">
+                            <input class="form-check-input" type="radio" name="sexo" id="feminino" value="F" required>
                             <label class="form-check-label" for="feminino">F</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="sexo" id="masculino" value="M">
+                            <input class="form-check-input" type="radio" name="sexo" id="masculino" value="M" required>
                             <label class="form-check-label" for="masculino">M</label>
                         </div>
                     </div>
@@ -311,18 +343,18 @@
                     <input type="text" class="form-control" id="especialidade">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Estado geral do Cliente</label>
+                    <label class="form-label required-field">Estado geral do Cliente</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="estadoGeral" id="bom" value="Bom">
+                            <input class="form-check-input" type="radio" name="estadoGeral" id="bom" value="Bom" required>
                             <label class="form-check-label" for="bom">Bom</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="estadoGeral" id="regular" value="Regular">
+                            <input class="form-check-input" type="radio" name="estadoGeral" id="regular" value="Regular" required>
                             <label class="form-check-label" for="regular">Regular</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="estadoGeral" id="grave" value="Grave">
+                            <input class="form-check-input" type="radio" name="estadoGeral" id="grave" value="Grave" required>
                             <label class="form-check-label" for="grave">Grave</label>
                         </div>
                     </div>
@@ -334,8 +366,8 @@
             <h3 class="form-title">Informações Clínicas</h3>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="diagnostico" class="form-label">Diagnóstico</label>
-                    <input type="text" class="form-control" id="diagnostico">
+                    <label for="diagnostico" class="form-label required-field">Diagnóstico</label>
+                    <input type="text" class="form-control" id="diagnostico" required>
                 </div>
                 <div class="col-md-6">
                     <label for="cid" class="form-label">CID</label>
@@ -345,43 +377,43 @@
             
             <div class="row g-3 mt-3">
                 <div class="col-md-12">
-                    <label for="cirurgiaProposta" class="form-label">Cirurgia Proposta</label>
-                    <input type="text" class="form-control" id="cirurgiaProposta">
+                    <label for="cirurgiaProposta" class="form-label required-field">Cirurgia Proposta</label>
+                    <input type="text" class="form-control" id="cirurgiaProposta" required>
                 </div>
             </div>
             
             <div class="row g-3 mt-3">
                 <div class="col-md-6">
-                    <label class="form-label">CIRURGIA ONCOLÓGICA</label>
+                    <label class="form-label required-field">CIRURGIA ONCOLÓGICA</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="oncologica" id="oncologicaSim" value="SIM">
+                            <input class="form-check-input" type="radio" name="oncologica" id="oncologicaSim" value="SIM" required>
                             <label class="form-check-label" for="oncologicaSim">SIM</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="oncologica" id="oncologicaNao" value="NÃO">
+                            <input class="form-check-input" type="radio" name="oncologica" id="oncologicaNao" value="NÃO" required>
                             <label class="form-check-label" for="oncologicaNao">NÃO</label>
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
-                    <label class="form-label">Potencial de contaminação da cirurgia</label>
+                    <label class="form-label required-field">Potencial de contaminação da cirurgia</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="contaminacao" id="limpa" value="Limpa">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="limpa" value="Limpa" required>
                             <label class="form-check-label" for="limpa">Limpa</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="contaminacao" id="contaminada" value="Contaminada">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="contaminada" value="Contaminada" required>
                             <label class="form-check-label" for="contaminada">Contaminada</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="contaminacao" id="potencialmenteContaminada" value="Potencialmente Contaminada">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="potencialmenteContaminada" value="Potencialmente Contaminada" required>
                             <label class="form-check-label" for="potencialmenteContaminada">Pot. Contaminada</label>
                         </div>
                         <div class="checkbox-item">
-                            <input class="form-check-input" type="radio" name="contaminacao" id="infectante" value="Infectante">
+                            <input class="form-check-input" type="radio" name="contaminacao" id="infectante" value="Infectante" required>
                             <label class="form-check-label" for="infectante">Infectante</label>
                         </div>
                     </div>
@@ -451,12 +483,12 @@
             <h3 class="form-title">Equipe Cirúrgica</h3>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="cirurgiao" class="form-label">Cirurgião</label>
-                    <input type="text" class="form-control" id="cirurgiao">
+                    <label for="cirurgiao" class="form-label required-field">Cirurgião</label>
+                    <input type="text" class="form-control" id="cirurgiao" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="crmCirurgiao" class="form-label">CRM</label>
-                    <input type="text" class="form-control" id="crmCirurgiao">
+                    <label for="crmCirurgiao" class="form-label required-field">CRM</label>
+                    <input type="text" class="form-control" id="crmCirurgiao" required>
                 </div>
                 <div class="col-md-3">
                     <label for="primeiroAuxiliar" class="form-label">1º Auxiliar</label>
@@ -489,12 +521,12 @@
                     <input type="text" class="form-control" id="crmTerceiroAuxiliar">
                 </div>
                 <div class="col-md-6">
-                    <label for="anestesiologista" class="form-label">Anestesiologista</label>
-                    <input type="text" class="form-control" id="anestesiologista">
+                    <label for="anestesiologista" class="form-label required-field">Anestesiologista</label>
+                    <input type="text" class="form-control" id="anestesiologista" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="crmAnestesiologista" class="form-label">CRM</label>
-                    <input type="text" class="form-control" id="crmAnestesiologista">
+                    <label for="crmAnestesiologista" class="form-label required-field">CRM</label>
+                    <input type="text" class="form-control" id="crmAnestesiologista" required>
                 </div>
             </div>
             
@@ -597,12 +629,12 @@
             <h3 class="form-title">Responsáveis</h3>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="medicoResponsavel" class="form-label">Médico responsável pelo preenchimento</label>
-                    <input type="text" class="form-control" id="medicoResponsavel">
+                    <label for="medicoResponsavel" class="form-label required-field">Médico responsável pelo preenchimento</label>
+                    <input type="text" class="form-control" id="medicoResponsavel" required>
                 </div>
                 <div class="col-md-6">
-                    <label for="enfermeiroClinica" class="form-label">Enfermeiro Clínica</label>
-                    <input type="text" class="form-control" id="enfermeiroClinica">
+                    <label for="enfermeiroClinica" class="form-label required-field">Enfermeiro Clínica</label>
+                    <input type="text" class="form-control" id="enfermeiroClinica" required>
                 </div>
             </div>
             
@@ -657,8 +689,15 @@
         </div>
         
         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-            <button class="btn btn-primary me-md-2" type="button" id="gerar-pdf">Gerar PDF</button>
-            <button class="btn btn-secondary" type="button" id="limpar-form">Limpar Formulário</button>
+            <button class="btn btn-primary me-md-2" type="button" id="gerar-pdf">
+                <i class="fas fa-file-pdf me-2"></i> Gerar PDF
+            </button>
+            <button class="btn btn-primary me-md-2" type="button" id="imprimir-form">
+                <i class="fas fa-print me-2"></i> Imprimir
+            </button>
+            <button class="btn btn-secondary" type="button" id="limpar-form">
+                <i class="fas fa-trash-alt me-2"></i> Limpar
+            </button>
         </div>
     </div>
 
@@ -669,18 +708,285 @@
         </label>
     </div>
 
+    <!-- Adicionando Font Awesome para ícones -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Theme switcher
+        // Função para carregar o modelo PDF
+        async function loadPdfTemplate() {
+            try {
+                // URL do modelo PDF (substitua pela URL correta)
+                const modelUrl = 'AVISO_01_eletiva.pdf';
+                const response = await fetch(modelUrl);
+                if (!response.ok) throw new Error('Erro ao carregar modelo PDF');
+                return await response.arrayBuffer();
+            } catch (error) {
+                console.error('Erro ao carregar modelo PDF:', error);
+                throw error;
+            }
+        }
+
+        // Função para preencher datas automáticas
+        function preencherDatasAutomaticas() {
+            const hoje = new Date();
+            const dataFormatada = hoje.toISOString().split('T')[0];
+            const horaFormatada = hoje.toTimeString().substring(0, 5);
+            
+            document.getElementById('dataEnfermeiro').value = dataFormatada;
+            document.getElementById('horaEnfermeiro').value = horaFormatada;
+            document.getElementById('dataLiberacao').value = dataFormatada;
+            document.getElementById('horaLiberacao').value = horaFormatada;
+        }
+
+        // Função para validar formulário
+        function validarFormulario() {
+            const camposObrigatorios = [
+                'dataCirurgia', 'horario', 'prontuario', 'nomeCliente', 'idade',
+                'diagnostico', 'cirurgiaProposta', 'cirurgiao', 'crmCirurgiao',
+                'anestesiologista', 'crmAnestesiologista', 'medicoResponsavel', 'enfermeiroClinica'
+            ];
+            
+            let valido = true;
+            
+            camposObrigatorios.forEach(id => {
+                const campo = document.getElementById(id);
+                if (!campo || !campo.value) {
+                    campo.style.borderColor = 'var(--danger-color)';
+                    valido = false;
+                } else {
+                    campo.style.borderColor = '';
+                }
+            });
+            
+            // Validar radio buttons obrigatórios
+            const gruposRadio = ['sexo', 'estadoGeral', 'oncologica', 'contaminacao'];
+            gruposRadio.forEach(name => {
+                if (!document.querySelector(`input[name="${name}"]:checked`)) {
+                    valido = false;
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        radio.parentElement.style.color = 'var(--danger-color)';
+                    });
+                } else {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        radio.parentElement.style.color = '';
+                    });
+                }
+            });
+            
+            return valido;
+        }
+
+        // Função para gerar PDF
+        async function gerarPDF() {
+            if (!validarFormulario()) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            try {
+                // Carregar modelo PDF
+                const pdfBytes = await loadPdfTemplate();
+                const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+                const form = pdfDoc.getForm();
+                
+                // Função auxiliar para preencher campos de texto
+                const setTextField = (fieldName, value) => {
+                    try {
+                        const field = form.getTextField(fieldName);
+                        if (field) field.setText(value || '');
+                    } catch (error) {
+                        console.warn(`Erro ao preencher campo ${fieldName}:`, error);
+                    }
+                };
+
+                // Função auxiliar para marcar checkboxes/radiobuttons
+                const setRadioButton = (fieldName, value) => {
+                    try {
+                        const field = form.getRadioGroup(fieldName);
+                        if (field) field.select(value);
+                    } catch (error) {
+                        console.warn(`Erro ao marcar radio button ${fieldName}:`, error);
+                    }
+                };
+
+                // Função auxiliar para formatar data
+                const formatDate = (dateString) => {
+                    if (!dateString) return '';
+                    const [year, month, day] = dateString.split('-');
+                    return `${day}/${month}/${year}`;
+                };
+
+                // Função auxiliar para formatar hora
+                const formatTime = (timeString) => {
+                    if (!timeString) return '';
+                    return timeString.substring(0, 5); // Remove segundos se houver
+                };
+
+                // Preencher dados da cirurgia
+                setTextField('Data da Cirurgia', formatDate(document.getElementById('dataCirurgia').value));
+                setTextField('Horário', formatTime(document.getElementById('horario').value));
+                setTextField('Prontuário', document.getElementById('prontuario').value);
+                setTextField('Duração estimada', document.getElementById('duracao').value);
+
+                // Dados do paciente
+                setTextField('Nome do Cliente', document.getElementById('nomeCliente').value);
+                setTextField('Idade', document.getElementById('idade').value);
+                setTextField('Peso', document.getElementById('peso').value);
+
+                // Sexo (tratamento especial)
+                const sexo = document.querySelector('input[name="sexo"]:checked')?.value;
+                if (sexo === 'F') {
+                    setRadioButton('Sexo', 'Feminino');
+                } else if (sexo === 'M') {
+                    setRadioButton('Sexo', 'Masculino');
+                }
+
+                setTextField('Nome da Mãe', document.getElementById('nomeMae').value);
+                setTextField('Data de Nascimento', formatDate(document.getElementById('dataNascimento').value));
+                setTextField('Clínica', document.getElementById('clinica').value);
+                setTextField('Leito', document.getElementById('leito').value);
+                setTextField('Especialidade', document.getElementById('especialidade').value);
+
+                // Estado geral
+                const estadoGeral = document.querySelector('input[name="estadoGeral"]:checked')?.value;
+                if (estadoGeral) {
+                    setRadioButton('Estado geral', estadoGeral);
+                }
+
+                // Informações clínicas
+                setTextField('Diagnóstico', document.getElementById('diagnostico').value);
+                setTextField('CID', document.getElementById('cid').value);
+                setTextField('Cirurgia Proposta', document.getElementById('cirurgiaProposta').value);
+
+                // Cirurgia oncológica
+                const oncologica = document.querySelector('input[name="oncologica"]:checked')?.value;
+                if (oncologica === 'SIM') {
+                    setRadioButton('CIRURGIA ONCOLÓGICA', 'SIM');
+                } else {
+                    setRadioButton('CIRURGIA ONCOLÓGICA', 'NÃO');
+                }
+
+                // Contaminação
+                const contaminacao = document.querySelector('input[name="contaminacao"]:checked')?.value;
+                if (contaminacao) {
+                    setRadioButton('Potencial de contaminação', contaminacao);
+                }
+
+                // Precauções (checkboxes)
+                const precaucoes = [];
+                if (document.getElementById('precaucaoPadrao').checked) precaucoes.push('Padrão');
+                if (document.getElementById('precaucaoContato').checked) precaucoes.push('Contato');
+                if (document.getElementById('precaucaoAerossois').checked) precaucoes.push('Aerossóis');
+                if (document.getElementById('precaucaoGotículas').checked) precaucoes.push('Gotículas');
+                if (document.getElementById('precaucaoCOVID').checked) precaucoes.push('COVID');
+                setTextField('Precauções', precaucoes.join(', '));
+
+                // Solicitações
+                const uti = document.querySelector('input[name="uti"]:checked')?.value;
+                if (uti) {
+                    setRadioButton('Solicitação UTI', uti);
+                }
+
+                const sangue = document.querySelector('input[name="sangue"]:checked')?.value;
+                if (sangue) {
+                    setRadioButton('Solicitação sangue', sangue);
+                }
+
+                // Equipe cirúrgica
+                setTextField('Cirurgião', document.getElementById('cirurgiao').value);
+                setTextField('CRM Cirurgião', document.getElementById('crmCirurgiao').value);
+                setTextField('1º Auxiliar', document.getElementById('primeiroAuxiliar').value);
+                setTextField('CRM 1º Auxiliar', document.getElementById('crmPrimeiroAuxiliar').value);
+                setTextField('2º Auxiliar', document.getElementById('segundoAuxiliar').value);
+                setTextField('CRM 2º Auxiliar', document.getElementById('crmSegundoAuxiliar').value);
+                setTextField('3º Auxiliar', document.getElementById('terceiroAuxiliar').value);
+                setTextField('CRM 3º Auxiliar', document.getElementById('crmTerceiroAuxiliar').value);
+                setTextField('Anestesiologista', document.getElementById('anestesiologista').value);
+                setTextField('CRM Anestesiologista', document.getElementById('crmAnestesiologista').value);
+
+                const instrumentador = document.querySelector('input[name="instrumentador"]:checked')?.value;
+                if (instrumentador) {
+                    setRadioButton('Instrumentador', instrumentador);
+                }
+
+                // Preparo e materiais
+                setTextField('Preparo pré-operatório', document.getElementById('preparoPreOperatorio').value);
+                setTextField('Instrumental cirúrgico', document.getElementById('instrumentalCirurgico').value);
+                setTextField('Materiais consignados', document.getElementById('materiaisConsignados').value);
+                setTextField('Empresa Consignados', document.getElementById('empresaConsignados').value);
+
+                // Equipamentos específicos
+                const equipamentos = [];
+                if (document.getElementById('bisturiArgônio').checked) equipamentos.push('Bisturi de Argônio');
+                if (document.getElementById('bisturiEletrico').checked) equipamentos.push('Bisturi Elétrico');
+                if (document.getElementById('escopia').checked) equipamentos.push('Escopia');
+                if (document.getElementById('microscopioOlympus').checked) equipamentos.push('Microscópio Olympus');
+                if (document.getElementById('microscopioZeiss').checked) equipamentos.push('Microscópio Zeiss');
+                if (document.getElementById('microscopioLeica').checked) equipamentos.push('Microscópio Leica');
+                if (document.getElementById('torreVideo').checked) equipamentos.push('Torre de Vídeo');
+                if (document.getElementById('ultrassom').checked) equipamentos.push('Ultrassom');
+                setTextField('Reserva Equipamentos', equipamentos.join(', '));
+
+                setTextField('Fios Cirúrgicos', document.getElementById('fiosCirurgicos').value);
+
+                // Responsáveis
+                setTextField('Médico responsável', document.getElementById('medicoResponsavel').value);
+                setTextField('Enfermeiro Clínica', document.getElementById('enfermeiroClinica').value);
+                setTextField('Data Enfermeiro', formatDate(document.getElementById('dataEnfermeiro').value));
+                setTextField('Hora Enfermeiro', formatTime(document.getElementById('horaEnfermeiro').value));
+
+                // Liberação de cirurgia
+                const aih = document.querySelector('input[name="aih"]:checked')?.value;
+                if (aih) {
+                    setRadioButton('AIH', aih);
+                }
+                setTextField('PROCEDIMENTO', document.getElementById('procedimento').value);
+                setTextField('DATA Liberação', formatDate(document.getElementById('dataLiberacao').value));
+                setTextField('HORAS Liberação', formatTime(document.getElementById('horaLiberacao').value));
+                setTextField('ASSINATURA Liberação', document.getElementById('assinaturaLiberacao').value);
+
+                // Salvar o PDF preenchido
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Aviso_Cirurgia_${document.getElementById('nomeCliente').value.replace(/\s+/g, '_')}.pdf`;
+                link.click();
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('Ocorreu um erro ao gerar o PDF. Por favor, tente novamente.');
+            }
+        }
+
+        // Configurar eventos dos botões
+        document.getElementById('gerar-pdf').addEventListener('click', gerarPDF);
+        document.getElementById('imprimir-form').addEventListener('click', () => window.print());
+        
+        // Função para limpar o formulário
+        document.getElementById('limpar-form').addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+                document.querySelectorAll('input, textarea, select').forEach(element => {
+                    if (element.type === 'radio' || element.type === 'checkbox') {
+                        element.checked = false;
+                    } else {
+                        element.value = '';
+                    }
+                });
+                // Preencher datas automáticas novamente
+                preencherDatasAutomaticas();
+            }
+        });
+
+        // Configurar tema dark/light
         const themeToggle = document.getElementById('theme-toggle');
         const html = document.documentElement;
         
-        // Check for saved theme preference or use preferred color scheme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             html.setAttribute('data-theme', savedTheme);
             themeToggle.checked = savedTheme === 'dark';
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             html.setAttribute('data-theme', 'dark');
             themeToggle.checked = true;
         }
@@ -694,194 +1000,10 @@
                 localStorage.setItem('theme', 'light');
             }
         });
-        
-        // Form clearing
-        document.getElementById('limpar-form').addEventListener('click', () => {
-            const formElements = document.querySelectorAll('input, textarea, select');
-            formElements.forEach(element => {
-                if (element.type === 'radio' || element.type === 'checkbox') {
-                    element.checked = false;
-                } else {
-                    element.value = '';
-                }
-            });
-        });
-        
-        // PDF Generation
-        document.getElementById('gerar-pdf').addEventListener('click', async () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Set document properties
-            doc.setProperties({
-                title: 'AVISO E ANOTAÇÃO DE CIRURGIA ELETIVA',
-                subject: 'Formulário de Cirurgia Eletiva',
-                author: 'Cirurgias HC',
-                keywords: 'cirurgia, eletiva, hospital',
-                creator: 'Cirurgias HC'
-            });
-            
-            // Add title
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.text('AVISO E ANOTAÇÃO DE CIRURGIA ELETIVA', 105, 15, { align: 'center' });
-            
-            // Add form data
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            
-            let yPosition = 30;
-            
-            // Section 1: Dados da Cirurgia
-            doc.setFont('helvetica', 'bold');
-            doc.text('Espaço preenchido pelo (a) médico (a)', 14, yPosition);
-            yPosition += 5;
-            
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Data da Cirurgia: ${document.getElementById('dataCirurgia').value}`, 14, yPosition);
-            doc.text(`Horário: ${document.getElementById('horario').value}`, 60, yPosition);
-            doc.text(`Prontuário: ${document.getElementById('prontuario').value}`, 100, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Nome do Cliente: ${document.getElementById('nomeCliente').value}`, 14, yPosition);
-            doc.text(`Idade: ${document.getElementById('idade').value}`, 100, yPosition);
-            doc.text(`Peso: ${document.getElementById('peso').value}`, 130, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Nome da Mãe: ${document.getElementById('nomeMae').value}`, 14, yPosition);
-            doc.text(`Data de Nascimento: ${document.getElementById('dataNascimento').value}`, 70, yPosition);
-            
-            const sexo = document.querySelector('input[name="sexo"]:checked');
-            doc.text(`Sexo: ${sexo ? sexo.value : ''}`, 130, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Clínica: ${document.getElementById('clinica').value}`, 14, yPosition);
-            doc.text(`Leito: ${document.getElementById('leito').value}`, 70, yPosition);
-            doc.text(`Especialidade: ${document.getElementById('especialidade').value}`, 100, yPosition);
-            yPosition += 7;
-            
-            const estadoGeral = document.querySelector('input[name="estadoGeral"]:checked');
-            doc.text(`Estado geral do Cliente: ${estadoGeral ? estadoGeral.value : ''}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Diagnóstico: ${document.getElementById('diagnostico').value}`, 14, yPosition);
-            doc.text(`CID: ${document.getElementById('cid').value}`, 100, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Cirurgia Proposta: ${document.getElementById('cirurgiaProposta').value}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Duração estimada: ${document.getElementById('duracao').value}`, 14, yPosition);
-            
-            const oncologica = document.querySelector('input[name="oncologica"]:checked');
-            doc.text(`CIRURGIA ONCOLÓGICA: ${oncologica ? oncologica.value : ''}`, 70, yPosition);
-            yPosition += 7;
-            
-            const contaminacao = document.querySelector('input[name="contaminacao"]:checked');
-            doc.text(`Potencial de contaminação da cirurgia: ${contaminacao ? contaminacao.value : ''}`, 14, yPosition);
-            yPosition += 7;
-            
-            // Precauções (checkboxes)
-            const precaucoes = [];
-            if (document.getElementById('precaucaoPadrao').checked) precaucoes.push('Padrão');
-            if (document.getElementById('precaucaoContato').checked) precaucoes.push('Contato');
-            if (document.getElementById('precaucaoAerossois').checked) precaucoes.push('Aerossóis');
-            if (document.getElementById('precaucaoGotículas').checked) precaucoes.push('Gotículas');
-            if (document.getElementById('precaucaoCOVID').checked) precaucoes.push('COVID');
-            
-            doc.text(`Precauções: ${precaucoes.join(', ')}`, 14, yPosition);
-            yPosition += 7;
-            
-            const uti = document.querySelector('input[name="uti"]:checked');
-            doc.text(`Solicitação de reserva de vaga UTI: ${uti ? uti.value : ''}`, 14, yPosition);
-            
-            const sangue = document.querySelector('input[name="sangue"]:checked');
-            doc.text(`Solicitação de reserva de sangue: ${sangue ? sangue.value : ''}`, 70, yPosition);
-            yPosition += 7;
-            
-            // Equipe Cirúrgica
-            doc.text(`Cirurgião: ${document.getElementById('cirurgiao').value}`, 14, yPosition);
-            doc.text(`CRM: ${document.getElementById('crmCirurgiao').value}`, 70, yPosition);
-            doc.text(`1º Auxiliar: ${document.getElementById('primeiroAuxiliar').value}`, 100, yPosition);
-            yPosition += 7;
-            
-            doc.text(`CRM: ${document.getElementById('crmPrimeiroAuxiliar').value}`, 14, yPosition);
-            doc.text(`2º Auxiliar: ${document.getElementById('segundoAuxiliar').value}`, 70, yPosition);
-            doc.text(`CRM: ${document.getElementById('crmSegundoAuxiliar').value}`, 100, yPosition);
-            doc.text(`3º Auxiliar: ${document.getElementById('terceiroAuxiliar').value}`, 130, yPosition);
-            yPosition += 7;
-            
-            doc.text(`CRM: ${document.getElementById('crmTerceiroAuxiliar').value}`, 14, yPosition);
-            doc.text(`Anestesiologista: ${document.getElementById('anestesiologista').value}`, 70, yPosition);
-            doc.text(`CRM: ${document.getElementById('crmAnestesiologista').value}`, 130, yPosition);
-            yPosition += 7;
-            
-            const instrumentador = document.querySelector('input[name="instrumentador"]:checked');
-            doc.text(`Instrumentador: ${instrumentador ? instrumentador.value : ''}`, 14, yPosition);
-            yPosition += 7;
-            
-            // Preparo e Materiais
-            doc.text(`Preparo pré-operatório: ${document.getElementById('preparoPreOperatorio').value}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Instrumental cirúrgico: ${document.getElementById('instrumentalCirurgico').value}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Materiais consignados: ${document.getElementById('materiaisConsignados').value}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Empresa Consignados: ${document.getElementById('empresaConsignados').value}`, 14, yPosition);
-            yPosition += 7;
-            
-            // Equipamentos Específicos (checkboxes)
-            const equipamentos = [];
-            if (document.getElementById('bisturiArgônio').checked) equipamentos.push('Bisturi de Argônio');
-            if (document.getElementById('bisturiEletrico').checked) equipamentos.push('Bisturi Elétrico');
-            if (document.getElementById('escopia').checked) equipamentos.push('Escopia');
-            if (document.getElementById('microscopioOlympus').checked) equipamentos.push('Microscópio Olympus');
-            if (document.getElementById('microscopioZeiss').checked) equipamentos.push('Microscópio Zeiss');
-            if (document.getElementById('microscopioLeica').checked) equipamentos.push('Microscópio Leica');
-            if (document.getElementById('torreVideo').checked) equipamentos.push('Torre de Vídeo');
-            if (document.getElementById('ultrassom').checked) equipamentos.push('Ultrassom');
-            
-            doc.text(`Reserva Equipamentos Específicos: ${equipamentos.join(', ')}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Fios Cirúrgicos: ${document.getElementById('fiosCirurgicos').value}`, 14, yPosition);
-            yPosition += 10;
-            
-            // Responsáveis
-            doc.text(`Médico responsável pelo preenchimento: ${document.getElementById('medicoResponsavel').value}`, 14, yPosition);
-            yPosition += 7;
-            
-            doc.text(`Enfermeiro Clínica: ${document.getElementById('enfermeiroClinica').value}`, 14, yPosition);
-            doc.text(`Data: ${document.getElementById('dataEnfermeiro').value}`, 70, yPosition);
-            doc.text(`Hora: ${document.getElementById('horaEnfermeiro').value}`, 100, yPosition);
-            yPosition += 10;
-            
-            // Liberação de Cirurgia
-            doc.setFont('helvetica', 'bold');
-            doc.text('LIBERAÇÃO DE REALIZAÇÃO DE CIRURGIA', 105, yPosition, { align: 'center' });
-            yPosition += 7;
-            
-            doc.setFont('helvetica', 'normal');
-            const aih = document.querySelector('input[name="aih"]:checked');
-            doc.text(`AIH: ${aih ? aih.value : ''}`, 14, yPosition);
-            doc.text(`PROCEDIMENTO: ${document.getElementById('procedimento').value}`, 70, yPosition);
-            yPosition += 7;
-            
-            doc.text(`DATA: ${document.getElementById('dataLiberacao').value}`, 14, yPosition);
-            doc.text(`HORAS: ${document.getElementById('horaLiberacao').value}`, 70, yPosition);
-            doc.text(`ASSINATURA: ${document.getElementById('assinaturaLiberacao').value}`, 100, yPosition);
-            yPosition += 7;
-            
-            // Footer note
-            doc.setFontSize(8);
-            doc.text('Antes do aviso de cirurgia ser enviado ao centro cirúrgico é necessário a assinatura do (a) enfermeiro (a) da clínica.', 14, 280);
-            doc.text('O médico deve preencher todos os dados por completo e com o n° correto do prontuário do cliente. Caso contrário o aviso poderá ser devolvido.', 14, 285);
-            
-            // Save the PDF
-            doc.save('Aviso_Cirurgia_Eletiva.pdf');
+
+        // Inicializar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            preencherDatasAutomaticas();
         });
     </script>
 </body>
