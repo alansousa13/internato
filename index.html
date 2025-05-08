@@ -716,7 +716,7 @@
         async function loadPdfTemplate() {
             try {
                 // URL do modelo PDF (substitua pela URL correta)
-                const modelUrl = 'AVISO_01_eletiva.pdf';
+                const modelUrl = 'file:///C:/Users/alans/Downloads/AVISO%2001%20-%20eletiva.pdf';
                 const response = await fetch(modelUrl);
                 if (!response.ok) throw new Error('Erro ao carregar modelo PDF');
                 return await response.arrayBuffer();
